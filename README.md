@@ -14,6 +14,11 @@
 
 ---
 
+## Дизайн
+Доступен по [ссылке](https://www.figma.com/design/Odl7j4Cp3IWWeRokEEFsFT/choice.io?node-id=0-1&p=f&t=s4nW7n0sYOxG9hLw-0)
+
+---
+
 ## Скриншоты
 
 *Скриншоты появятся здесь в процессе разработки*
