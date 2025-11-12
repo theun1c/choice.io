@@ -15,30 +15,46 @@
 ---
 
 ## Дизайн
-Доступен по [ссылке](https://www.figma.com/design/Odl7j4Cp3IWWeRokEEFsFT/choice.io?node-id=0-1&p=f&t=s4nW7n0sYOxG9hLw-0)
+
+#### Ссылки
+
+- [Figma макет](https://www.figma.com/design/Odl7j4Cp3IWWeRokEEFsFT/choice.io?node-id=0-1&p=f&t=s4nW7n0sYOxG9hLw-0) - основной дизайн проекта (choice.io design v.2.0)
+- [Дизайн документация](documents/Дизайн%20приложения.docx) - описание дизайн-системы
+
+
+#### Макет
+
+![design1](assets/design1.png)
+
+#### Цветовая палитра
+
+``` 
+Основной текст: #000000
+Акцентный цвет: #0022FF  
+Успешное действие: #34C759
+Ошибка/Отказ: #FF383C
+```
+
+#### Шрифты
+
+- Montserrat Bold - основной текст
+- Montserrat Regular - заголовки
+- Montserrat Medium - второстепенный текст
 
 ---
 
-## Скриншоты
+## База данных / Backend часть 
 
-*Скриншоты появятся здесь в процессе разработки*
+#### Архитектура данных
+- ER-диаграмма - схема базы данных (в процессе разработки)
+- Документация - описание backend-части
 
-## Начало работы
 
-### Предварительные требования
+#### Технологии
+- Supabase - облачная база данных
+- Jikan API - внешний источник данных об аниме
+- 
 
-- Android Studio (для нативной разработки)
-- Git для управления версиями
-
----
-
-### Установка
-
-# Клонирование репозитория
-git clone https://github.com/theun1c/choice.io.git
-
-# Переход в директорию проекта
-cd choice.io
 
 ---
 
@@ -57,6 +73,3 @@ cd choice.io
 
 # Автор
 - [theun1cGH](https://github.com/theun1c) github
-- [theun1cGL](https://gitlab.ngknn.ru/theun1c) gitlab 
-
----
