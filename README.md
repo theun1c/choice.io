@@ -192,6 +192,6 @@ choice.io/
 ---
 
 # Автор
-- [theun1cGH](https://github.com/theun1c) github
+- [theun1c](https://github.com/theun1c) github
 
 ---
