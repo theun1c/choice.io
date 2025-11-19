@@ -1,0 +1,139 @@
+&jikan.AnimeById{
+  Data: jikan.AnimeBase{
+    MalId:  1,
+    Url:    "https://myanimelist.net/anime/1/Cowboy_Bebop",
+    Images: jikan.Images3{
+      Jpg: struct { ImageUrl string "json:\"image_url\""; SmallImageUrl string "json:\"small_image_url\""; LargeImageUrl string "json:\"large_image_url\"" }{
+        ImageUrl:      "https://cdn.myanimelist.net/images/anime/4/19644.jpg",
+        SmallImageUrl: "https://cdn.myanimelist.net/images/anime/4/19644t.jpg",
+        LargeImageUrl: "https://cdn.myanimelist.net/images/anime/4/19644l.jpg",
+      },
+      Webp: struct { ImageUrl string "json:\"image_url\""; SmallImageUrl string "json:\"small_image_url\""; LargeImageUrl string "json:\"large_image_url\"" }{
+        ImageUrl:      "https://cdn.myanimelist.net/images/anime/4/19644.webp",
+        SmallImageUrl: "https://cdn.myanimelist.net/images/anime/4/19644t.webp",
+        LargeImageUrl: "https://cdn.myanimelist.net/images/anime/4/19644l.webp",
+      },
+    },
+    Trailer: struct { YoutubeID string "json:\"youtube_id\""; Url string "json:\"url\""; EmbedUrl string "json:\"embed_url\"" }{
+      YoutubeID: "",
+      Url:       "",
+      EmbedUrl:  "https://www.youtube-nocookie.com/embed/gY5nDXOtv_o?enablejsapi=1&wmode=opaque&autoplay=1",
+    },
+    Title:         "Cowboy Bebop",
+    TitleEnglish:  "Cowboy Bebop",
+    TitleJapanese: "カウボーイビバップ",
+    TitleSynonyms: []string{},
+    Type:          "TV",
+    Source:        "Original",
+    Episodes:      26,
+    Status:        "Finished Airing",
+    Airing:        false,
+    Aired:         jikan.DateRange{
+      From: 1998-04-03 00:00:00 ,
+      To:   1999-04-24 00:00:00 ,
+      Prop: struct { From struct { Day int "json:\"day\""; Month int "json:\"month\""; Year int "json:\"year\"" } "json:\"from\""; To struct { Day int "json:\"day\""; Month int "json:\"month\""; Year int "json:\"year\"" } "json:\"to\""; String string "json:\"string\"" }{
+        From: struct { Day int "json:\"day\""; Month int "json:\"month\""; Year int "json:\"year\"" }{
+          Day:   3,
+          Month: 4,
+          Year:  1998,
+        },
+        To: struct { Day int "json:\"day\""; Month int "json:\"month\""; Year int "json:\"year\"" }{
+          Day:   24,
+          Month: 4,
+          Year:  1999,
+        },
+        String: "",
+      },
+    },
+    Duration:   "24 min per ep",
+    Rating:     "R - 17+ (violence & profanity)",
+    Score:      8.750000,
+    ScoredBy:   1038238,
+    Rank:       48,
+    Popularity: 42,
+    Members:    2010769,
+    Favorites:  88043,
+    Synopsis:   "Crime is timeless. By the year 2071, humanity has expanded across the galaxy, filling the surface of other planets with settlements like those on Earth. These new societies are plagued by murder, drug use, and theft, and intergalactic outlaws are hunted by a growing number of tough bounty hunters.\n\nSpike Spiegel and Jet Black pursue criminals throughout space to make a humble living. Beneath his goofy and aloof demeanor, Spike is haunted by the weight of his violent past. Meanwhile, Jet manages his own troubled memories while taking care of Spike and the Bebop, their ship. The duo is joined by the beautiful con artist Faye Valentine, odd child Edward Wong Hau Pepelu Tivrusky IV, and Ein, a bioengineered Welsh corgi.\n\nWhile developing bonds and working to catch a colorful cast of criminals, the Bebop crew's lives are disrupted by a menace from Spike's past. As a rival's maniacal plot continues to unravel, Spike must choose between life with his newfound family or revenge for his old wounds.\n\n[Written by MAL Rewrite]",
+    Background: "When Cowboy Bebop first aired in spring of 1998 on TV Tokyo, only episodes 2-3, 7-15, and 18 were broadcast, it was concluded with a recap special known as Yose Atsume Blues. This was due to anime censorship having increased following the big controversies over Evangelion, as a result most of the series was pulled from the air due to violent content. Satellite channel WOWOW picked up the series in the fall of that year and aired it in its entirety uncensored. Cowboy Bebop was not a ratings hit in Japan, but sold over 19,000 DVD units in the initial release run, and 81,000 overall. Protagonist Spike Spiegel won Best Male Character, and Megumi Hayashibara won Best Voice Actor for her role as Faye Valentine in the 1999 and 2000 Anime Grand Prix, respectively. Cowboy Bebop's biggest influence has been in the United States, where it premiered on Adult Swim in 2001 with many reruns since. The show's heavy Western influence struck a chord with American viewers, where it became a \"gateway drug\" to anime aimed at adult audiences.",
+    Season:     "spring",
+    Year:       1998,
+    Broadcast:  struct { Day string "json:\"day\""; Time string "json:\"time\""; Timezone string "json:\"timezone\""; String string "json:\"string\"" }{
+      Day:      "Saturdays",
+      Time:     "01:00",
+      Timezone: "Asia/Tokyo",
+      String:   "Saturdays at 01:00 (JST)",
+    },
+    Producers: []jikan.MalItem{
+      jikan.MalItem{
+        MalId: 23,
+        Type:  "anime",
+        Name:  "Bandai Visual",
+        Url:   "https://myanimelist.net/anime/producer/23/Bandai_Visual",
+      },
+      jikan.MalItem{
+        MalId: 123,
+        Type:  "anime",
+        Name:  "Victor Entertainment",
+        Url:   "https://myanimelist.net/anime/producer/123/Victor_Entertainment",
+      },
+      jikan.MalItem{
+        MalId: 1506,
+        Type:  "anime",
+        Name:  "Audio Planning U",
+        Url:   "https://myanimelist.net/anime/producer/1506/Audio_Planning_U",
+      },
+    },
+    Licensors: []jikan.MalItem{
+      jikan.MalItem{
+        MalId: 102,
+        Type:  "anime",
+        Name:  "Funimation",
+        Url:   "https://myanimelist.net/anime/producer/102/Funimation",
+      },
+    },
+    Studios: []jikan.MalItem{
+      jikan.MalItem{
+        MalId: 14,
+        Type:  "anime",
+        Name:  "Sunrise",
+        Url:   "https://myanimelist.net/anime/producer/14/Sunrise",
+      },
+    },
+    Genres: []jikan.MalItem{
+      jikan.MalItem{
+        MalId: 1,
+        Type:  "anime",
+        Name:  "Action",
+        Url:   "https://myanimelist.net/anime/genre/1/Action",
+      },
+      jikan.MalItem{
+        MalId: 46,
+        Type:  "anime",
+        Name:  "Award Winning",
+        Url:   "https://myanimelist.net/anime/genre/46/Award_Winning",
+      },
+      jikan.MalItem{
+        MalId: 24,
+        Type:  "anime",
+        Name:  "Sci-Fi",
+        Url:   "https://myanimelist.net/anime/genre/24/Sci-Fi",
+      },
+    },
+    ExplicitGenres: []jikan.MalItem{},
+    Themes:         []jikan.MalItem{
+      jikan.MalItem{
+        MalId: 50,
+        Type:  "anime",
+        Name:  "Adult Cast",
+        Url:   "https://myanimelist.net/anime/genre/50/Adult_Cast",
+      },
+      jikan.MalItem{
+        MalId: 29,
+        Type:  "an// ime",
+        Name:  "Space",
+        Url:   "https://myanimelist.net/anime/genre/29/Space",
+      },
+    },
+    Demographics: []jikan.MalI// tem{},
+  },
+}
