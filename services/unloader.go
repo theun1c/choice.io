@@ -1,9 +1,16 @@
 package services
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"time"
 
 	"github.com/darenliang/jikan-go"
+	"github.com/joho/godotenv"
 	"github.com/k0kubun/pp"
 )
 
@@ -114,7 +121,11 @@ func (u *Unloader) Start() {
 		count1++
 	}
 
-	
+	err = insertAnime(animeList)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 }
 
 // для удаления повторяющихся жанров
@@ -131,4 +142,74 @@ func removeDup(inputSlice []Genre) []Genre {
 	}
 
 	return resultSlice
+}
+
+func insertAnime(animeList []Anime) error {
+
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Warning: Could not load .env file")
+	}
+
+	supabaseKey := os.Getenv("API_KEY")
+	supabaseURL := os.Getenv("API_URL")
+
+	// Добавь проверку и вывод значений
+	fmt.Printf("API_URL: %s\n", supabaseURL)
+	fmt.Printf("API_KEY length: %d\n", len(supabaseKey))
+
+	if supabaseURL == "" {
+		return fmt.Errorf("SUPABASE_URL is empty")
+	}
+	if supabaseKey == "" {
+		return fmt.Errorf("SUPABASE_KEY is empty")
+	}
+
+	jsonData, err := json.Marshal(animeList)
+	if err != nil {
+		return fmt.Errorf("marshal error: %w", err)
+	}
+
+	url := fmt.Sprintf("%s/rest/v1/anime", supabaseURL)
+	fmt.Printf("Full URL: %s\n", url) // ← посмотрим полный URL
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return fmt.Errorf("request creation error: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("apikey", supabaseKey)
+	req.Header.Set("Authorization", "Bearer "+supabaseKey)
+	req.Header.Set("Prefer", "return=representation")
+
+	// Добавляем таймаут
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+
+	fmt.Println("Sending request...")
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("HTTP request failed: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	fmt.Printf("Response status: %d\n", resp.StatusCode)
+	fmt.Printf("Response body: %s\n", string(body))
+
+	if resp.StatusCode != 201 {
+		return fmt.Errorf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+
+	var result []Anime
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return fmt.Errorf("decode error: %w", err)
+	}
+
+	fmt.Printf("Inserted %d records\n", len(result))
+	return nil
 }
