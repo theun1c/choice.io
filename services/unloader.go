@@ -1,30 +1,215 @@
 package services
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
 	"time"
 
 	"github.com/darenliang/jikan-go"
+	"github.com/joho/godotenv"
 	"github.com/k0kubun/pp"
 )
 
+// структура лоадера
 type Unloader struct {
 }
 
+// конструктор лоадера
 func NewUnloader() *Unloader {
 	return &Unloader{}
 }
 
-// take all 50 animes in 1ne json from https://myanimelist.net/topanime.php?type=bypopularity page
+// создаем структуру жанров, при этом в структуре АНИМЕ будем использовать
+// jikan.MAlItem из за конвертации.
+type Genre struct {
+	MalId int    `json:"mal_id"`
+	Type  string `json:"type"`
+	Name  string `json:"name"`
+	Url   string `json:"url"`
+}
+
+// Структура для необходимых данных
+type Anime struct {
+	MalId        int           `json:"mal_id"`
+	Url          string        `json:"url"`
+	Images       jikan.Images3 `json:"images"`
+	Title        string        `json:"title"`
+	TitleEnglish string        `json:"title_english"`
+	Type         string        `json:"type"`
+	Episodes     int           `json:"episodes"`
+	Status       string        `json:"status"`
+	Rating       string        `json:"rating"`
+	Score        float64       `json:"score"`
+	Synopsis     string        `json:"synopsis"`
+	Year         int           `json:"year"`
+	Genres       []int         `json:"genres"`
+}
+
+// TODO: разбить объект Anime на несколько подъобъектов для удобной записи в супабейз
+
+// получили поля Аниме. Получили поля жанров.
+// жанры будут записываться в БД и проверяться на новые поля.
+// аниме сущность будет хранить массив айдишников на жанры, что создает связь 1 ко мн
 func (u *Unloader) Start() {
-	for i := 1; i <= 1; i++ {
-		anime, err := jikan.GetTopAnime(jikan.TopAnimeTypeTv, "bypopularity", 1) // https://myanimelist.net/topanime.php?type=bypopularity
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			pp.Println(anime.Data)
+	// в этом месте получаем только 25 записей за 1 запрос.
+	// нужно будет увеличить таймаут и итерировать страницы
+	anime, err := jikan.GetTopAnime("tv", "bypopularity", 2)
+	if err != nil {
+		fmt.Println("error: ", err)
+		return
+	}
+
+	// объявляем слайс, в котором будут лежать объекты аниме с нуными полями
+	var animeList []Anime
+
+	// список и для жанров
+	var genreList []Genre
+
+	// запускаем все в цикле
+	for i := 0; i < len(anime.Data); i++ {
+		// TODO: так может не делать общую структуру а разбить по мелким объектам сразу ?
+		// А нужно ли вообще разбивать все на разные таблицы ?
+
+		// пришел к выводу о том, что ТИПЫ аниме выделять в отдельную таблицу не стоит
+		// поскольку типы не нужны в аналитике и в данном проекте. они являются просто текстовым полем - не более
+		// и влияют только на описание, в то время как ЖАНРЫ, которые следует выделить в отдельную таблицу,
+		// помогут в реализации основной задумки проекта
+		anm := Anime{
+			MalId:        anime.Data[i].MalId,
+			Url:          anime.Data[i].Url,
+			Images:       anime.Data[i].Images,
+			Title:        anime.Data[i].Title,
+			TitleEnglish: anime.Data[i].TitleEnglish,
+			Type:         anime.Data[i].Type,
+			Episodes:     anime.Data[i].Episodes,
+			Status:       anime.Data[i].Status,
+			Rating:       anime.Data[i].Rating,
+			Score:        anime.Data[i].Score,
+			Synopsis:     anime.Data[i].Synopsis,
+			Year:         anime.Data[i].Year,
 		}
 
-		time.Sleep(10 * time.Second)
+		for j := 0; j < len(anime.Data[i].Genres); j++ {
+			gnr := Genre{
+				MalId: anime.Data[i].Genres[j].MalId,
+				Type:  anime.Data[i].Genres[j].Type,
+				Name:  anime.Data[i].Genres[j].Name,
+				Url:   anime.Data[i].Genres[j].Url,
+			}
+
+			anm.Genres = append(anm.Genres, gnr.MalId)
+
+			genreList = append(genreList, gnr)
+		}
+
+		animeList = append(animeList, anm)
 	}
+
+	// выводим полученные объекты
+	for i := 0; i < len(animeList); i++ {
+		pp.Println(animeList[i])
+	}
+
+	uniqueGenres := removeDup(genreList)
+	count1 := 0
+	for i := 0; i < len(uniqueGenres); i++ {
+		pp.Println(uniqueGenres[i])
+		count1++
+	}
+
+	err = insertAnime(animeList)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+}
+
+// для удаления повторяющихся жанров
+func removeDup(inputSlice []Genre) []Genre {
+	isUnique := map[Genre]bool{}
+
+	resultSlice := []Genre{}
+
+	for _, item := range inputSlice {
+		if !isUnique[item] {
+			isUnique[item] = true
+			resultSlice = append(resultSlice, item)
+		}
+	}
+
+	return resultSlice
+}
+
+func insertAnime(animeList []Anime) error {
+
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Warning: Could not load .env file")
+	}
+
+	supabaseKey := os.Getenv("API_KEY")
+	supabaseURL := os.Getenv("API_URL")
+
+	// Добавь проверку и вывод значений
+	fmt.Printf("API_URL: %s\n", supabaseURL)
+	fmt.Printf("API_KEY length: %d\n", len(supabaseKey))
+
+	if supabaseURL == "" {
+		return fmt.Errorf("SUPABASE_URL is empty")
+	}
+	if supabaseKey == "" {
+		return fmt.Errorf("SUPABASE_KEY is empty")
+	}
+
+	jsonData, err := json.Marshal(animeList)
+	if err != nil {
+		return fmt.Errorf("marshal error: %w", err)
+	}
+
+	url := fmt.Sprintf("%s/rest/v1/anime", supabaseURL)
+	fmt.Printf("Full URL: %s\n", url) // ← посмотрим полный URL
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return fmt.Errorf("request creation error: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("apikey", supabaseKey)
+	req.Header.Set("Authorization", "Bearer "+supabaseKey)
+	req.Header.Set("Prefer", "return=representation")
+
+	// Добавляем таймаут
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+
+	fmt.Println("Sending request...")
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("HTTP request failed: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	fmt.Printf("Response status: %d\n", resp.StatusCode)
+	fmt.Printf("Response body: %s\n", string(body))
+
+	if resp.StatusCode != 201 {
+		return fmt.Errorf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+
+	var result []Anime
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return fmt.Errorf("decode error: %w", err)
+	}
+
+	fmt.Printf("Inserted %d records\n", len(result))
+	return nil
 }
