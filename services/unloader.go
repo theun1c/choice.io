@@ -137,7 +137,7 @@ func (u *Unloader) Start() {
 // 	return resultSlice
 // }
 
-func insertAnime(animeItem Anime) (Anime, error) {
+func insertAnime(animeItem Anime) (*Anime, error) {
 
 	err := godotenv.Load()
 	if err != nil {
@@ -151,15 +151,15 @@ func insertAnime(animeItem Anime) (Anime, error) {
 	fmt.Printf("API_KEY length: %d\n", len(supabaseKey))
 
 	if supabaseURL == "" {
-		return Anime{}, fmt.Errorf("SUPABASE_URL is empty")
+		return nil, fmt.Errorf("SUPABASE_URL is empty")
 	}
 	if supabaseKey == "" {
-		return Anime{}, fmt.Errorf("SUPABASE_KEY is empty")
+		return nil, fmt.Errorf("SUPABASE_KEY is empty")
 	}
 
 	jsonData, err := json.Marshal(animeItem)
 	if err != nil {
-		return Anime{}, fmt.Errorf("marshal error: %w", err)
+		return nil, fmt.Errorf("marshal error: %w", err)
 	}
 
 	url := fmt.Sprintf("%s/rest/v1/anime", supabaseURL)
@@ -167,7 +167,7 @@ func insertAnime(animeItem Anime) (Anime, error) {
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return Anime{}, fmt.Errorf("request creation error: %w", err)
+		return nil, fmt.Errorf("request creation error: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -183,7 +183,7 @@ func insertAnime(animeItem Anime) (Anime, error) {
 	fmt.Println("Sending request...")
 	resp, err := client.Do(req)
 	if err != nil {
-		return Anime{}, fmt.Errorf("HTTP request failed: %w", err)
+		return nil, fmt.Errorf("HTTP request failed: %w", err)
 	}
 
 	defer resp.Body.Close()
@@ -193,22 +193,32 @@ func insertAnime(animeItem Anime) (Anime, error) {
 	fmt.Printf("Response body: %s\n", string(body))
 
 	if resp.StatusCode != 201 {
-		return Anime{}, fmt.Errorf("HTTP %d: %s", resp.StatusCode, resp.Status)
+		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, resp.Status)
 	}
 
 	var result Anime
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		return Anime{}, fmt.Errorf("decode error: %w", err)
+		return nil, fmt.Errorf("decode error: %w", err)
 	}
 
-	return result, nil
+	return &result, nil
 }
 
-func insertGenre(genreItem Genre) (Genre, error) {
+func insertGenre(genreItem Genre) (*Genre, error) {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Warning: Could not load .env file")
+	}
+
+	exists, genreID, err := genreExists(genreItem.MalId)
+	if err != nil {
+		return nil, err
+	}
+
+	if exists {
+		// Если существует - возвращаем его
+		return &Genre{ID: genreID, MalId: genreItem.MalId, Name: genreItem.Name, Type: genreItem.Type, Url: genreItem.Url}, nil
 	}
 
 	supabaseKey := os.Getenv("API_KEY")
@@ -218,15 +228,15 @@ func insertGenre(genreItem Genre) (Genre, error) {
 	fmt.Printf("API_KEY length: %d\n", len(supabaseKey))
 
 	if supabaseURL == "" {
-		return Genre{}, fmt.Errorf("SUPABASE_URL is empty")
+		return nil, fmt.Errorf("SUPABASE_URL is empty")
 	}
 	if supabaseKey == "" {
-		return Genre{}, fmt.Errorf("SUPABASE_KEY is empty")
+		return nil, fmt.Errorf("SUPABASE_KEY is empty")
 	}
 
 	jsonData, err := json.Marshal(genreItem)
 	if err != nil {
-		return Genre{}, fmt.Errorf("marshal error: %w", err)
+		return nil, fmt.Errorf("marshal error: %w", err)
 	}
 
 	url := fmt.Sprintf("%s/rest/v1/genre", supabaseURL)
@@ -234,7 +244,7 @@ func insertGenre(genreItem Genre) (Genre, error) {
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return Genre{}, fmt.Errorf("request creation error: %w", err)
+		return nil, fmt.Errorf("request creation error: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -250,7 +260,7 @@ func insertGenre(genreItem Genre) (Genre, error) {
 	fmt.Println("Sending request...")
 	resp, err := client.Do(req)
 	if err != nil {
-		return Genre{}, fmt.Errorf("HTTP request failed: %w", err)
+		return nil, fmt.Errorf("HTTP request failed: %w", err)
 	}
 
 	defer resp.Body.Close()
@@ -260,16 +270,56 @@ func insertGenre(genreItem Genre) (Genre, error) {
 	fmt.Printf("Response body: %s\n", string(body))
 
 	if resp.StatusCode != 201 {
-		return Genre{}, fmt.Errorf("HTTP %d: %s", resp.StatusCode, resp.Status)
+		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, resp.Status)
 	}
 
 	var result Genre
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		return Genre{}, fmt.Errorf("decode error: %w", err)
+		return nil, fmt.Errorf("decode error: %w", err)
 	}
 
-	return result, nil
+	return &result, nil
+}
+
+func genreExists(malId int) (bool, int64, error) {
+	supabaseKey := os.Getenv("API_KEY")
+	supabaseURL := os.Getenv("API_URL")
+
+	url := fmt.Sprintf("%s/rest/v1/anime?mal_id=eq.%d&select=id", supabaseURL, malId)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return false, 0, err
+	}
+
+	req.Header.Set("apikey", supabaseKey)
+	req.Header.Set("Authorization", "Bearer "+supabaseKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return false, 0, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return false, 0, fmt.Errorf("HTTP %d", resp.StatusCode)
+	}
+
+	var result []struct {
+		ID int64 `json:"id"`
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return false, 0, err
+	}
+
+	if len(result) > 0 {
+		return true, result[0].ID, nil
+	}
+
+	return false, 0, nil
 }
 
 func insertAnimeGenre(animeID, genreID int64) error {
