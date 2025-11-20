@@ -1,10 +1,12 @@
 package main
 
-import "github.com/theun1c/unloaded-service_choice.io/services"
+import (
+	"github.com/theun1c/unloaded-service_choice.io/services"
+)
 
 func main() {
 
-	unl := services.NewUnloader()
+	un := services.NewUnloader()
+	un.Start()
 
-	unl.Start()
 }
