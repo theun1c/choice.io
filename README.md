@@ -1,5 +1,9 @@
 # Unloaded service
 
+Сервис для выгрузки данных об аниме из MyAnimeList в Supabase.
+
+## База данных
+
 ``` sql 
 
 CREATE TABLE anime (
@@ -33,3 +37,37 @@ CREATE TABLE anime_genres (
 );
 
 ```
+
+## Использование 
+
+создать .env файл в корне проекта
+
+``` bash 
+API_KEY=твой_supabase_ключ
+API_URL=твой_supabase_адрес
+
+``` 
+
+Запустить сервис и следовать инструкциям в консоли 
+
+``` bash 
+unloader := services.NewUnloader()
+unloader.Start()
+```
+
+## Что делает 
+
+- Загружает аниме с MyAnimeList
+- Проверяет дубликаты
+- Сохраняет в 3 таблицы: аниме, жанры и связи между ними
+- Показывает статистику по каждой странице
+
+## Структура 
+
+- anime - основные данные аниме
+- genres - жанры
+- anime_genres - связи аниме с жанрами (многие-ко-многим)
+
+
+## TODO 
+- emprove architecture
