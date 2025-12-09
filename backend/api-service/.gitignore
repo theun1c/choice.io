@@ -1,0 +1,63 @@
+## Исключаем папки IDE
+.vs/
+.idea/
+
+## Исключаем пользовательские файлы Visual Studio
+*.user
+*.userosscache
+*.sln.docstates
+
+## Файлы сборки
+[Bb]in/
+[Oo]bj/
+
+## Папки пакетов
+packages/
+
+## Файлы журналов и баз данных
+*.log
+*.sqlite
+*.sqlite3
+
+## Резервные и временные файлы
+*~
+*.swp
+
+## Файлы проекта Rider
+*.sln.iml
+
+## Файлы ReSharper
+*.[Rr]e[Ss]harper
+
+## Файлы JustCode
+*.jc
+
+## Файлы DotCover
+*.dotCover
+
+## Файлы Visual Studio Code
+.vscode/
+
+## Файлы проекта Visual Studio
+*.csproj.user
+*.vbproj.user
+*.fsproj.user
+*.dbproj.user
+
+## Временные файлы
+[Tt]emp/
+
+## Файлы тестов
+[Tt]est[Rr]esult*/
+
+## Файлы покрытия кода
+[Cc]ode[Cc]overage*/
+
+## Файлы публикации
+[Pp]ublish/
+
+## Файлы проектов TypeScript
+*.tsbuildinfo
+
+## Файлы резервных копий
+*.backup.*
