@@ -8,6 +8,7 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false);
 // Сервисы
 builder.Services.AddSingleton<ISupabaseService, SupabaseService>();
 builder.Services.AddScoped<IFeedService, FeedService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Контроллеры
 builder.Services.AddControllers();
@@ -42,12 +43,5 @@ app.UseCors("AllowAll");
 app.UseRouting();
 app.MapControllers();
 
-// Console.WriteLine("========================================");
-// Console.WriteLine("Choice.io API запущен");
-// Console.WriteLine("Доступные эндпоинты:");
-// Console.WriteLine("  GET /api/feed?mood=happy&limit=20");
-// Console.WriteLine("  GET /api/feed/moods");
-// Console.WriteLine("  GET /swagger - документация API");
-// Console.WriteLine("========================================");
 
 app.Run();
