@@ -26,6 +26,7 @@ fun BaseButton(
     initialIsWhiteTheme: Boolean = false,
     isColorChangeable: Boolean = false,
     isRedButton: Boolean = false,
+    enabled: Boolean = true
 ) {
     var isWhiteTheme by remember { mutableStateOf(initialIsWhiteTheme) }
 
@@ -34,8 +35,6 @@ fun BaseButton(
     } else {
         initialIsWhiteTheme // берем статический флаг фолз
     }
-
-
 
     var containerColor = if (displayColorIsWhite) Color.White else Color(0xFF0022FF)
     var textColor = if (displayColorIsWhite) Color.Black else Color.White
@@ -48,9 +47,11 @@ fun BaseButton(
     Button(
 
         onClick = {
-            onClick()
-            if (isColorChangeable){
-                isWhiteTheme = !isWhiteTheme
+            if(enabled){
+                onClick()
+                if (isColorChangeable){
+                    isWhiteTheme = !isWhiteTheme
+                }
             }
         },
         modifier = modifier

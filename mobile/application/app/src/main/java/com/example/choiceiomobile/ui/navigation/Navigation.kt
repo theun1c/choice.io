@@ -14,14 +14,22 @@ import com.example.choiceiomobile.ui.screens.user.ProfileScreen
 @Composable
 fun AppNavigation(){
     val navController = rememberNavController()
+
     NavHost(
         navController = navController,
-        startDestination = "FeedScreen"
+        startDestination = "LoginScreen"
     ) {
         composable("LoginScreen") {
             LoginScreen(
                 onRegisterClick = {
                     navController.navigate("RegisterScreen")
+                },
+                onLoginSuccess = {
+                    navController.navigate("MoodScreen") {
+                        popUpTo("LoginScreen") {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
@@ -30,6 +38,13 @@ fun AppNavigation(){
             RegisterScreen(
                 onLoginClick = {
                     navController.navigate("LoginScreen")
+                },
+                onRegisterSuccess = {
+                    navController.navigate("MoodScreen"){
+                        popUpTo("LoginScreen") {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }

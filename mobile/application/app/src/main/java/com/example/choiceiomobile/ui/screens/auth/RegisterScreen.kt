@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +20,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.choiceiomobile.ui.auth.AuthViewModel
 import com.example.choiceiomobile.ui.components.buttons.BaseButton
 import com.example.choiceiomobile.ui.components.inputs.BaseTextField
 
@@ -26,10 +29,17 @@ import com.example.choiceiomobile.ui.components.inputs.BaseTextField
 @Composable
 fun RegisterScreen(
     onLoginClick: () -> Unit,
+    onRegisterSuccess: () -> Unit = {}
 ) {
-    var loginText by remember { mutableStateOf("") }
-    var registerText by remember { mutableStateOf("") }
-    var confirmRegisterText by remember { mutableStateOf("") }
+
+    val viewModel: AuthViewModel = viewModel()
+
+    val username by viewModel.registerUsername.collectAsState()
+    val password by viewModel.registerPassword.collectAsState()
+    val confirmPassword by viewModel.registerConfirmPassword.collectAsState()
+    val isLoading by viewModel.registerLoading.collectAsState()
+    val error by viewModel.registerError.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -58,8 +68,8 @@ fun RegisterScreen(
                     modifier = Modifier
                         .fillMaxWidth(),
                     isPassword = false,
-                    value = loginText,
-                    onValueChange = { loginText = it},
+                    value = username,
+                    onValueChange = { viewModel.setRegisterUsername(it)},
                     label = "username"
                 )
 
@@ -72,8 +82,8 @@ fun RegisterScreen(
                     modifier = Modifier
                         .fillMaxWidth(),
                     isPassword = true,
-                    value = registerText,
-                    onValueChange = { registerText = it},
+                    value = password,
+                    onValueChange = { viewModel.setRegisterPassword(it)},
                     label = "password"
                 )
 
@@ -86,8 +96,8 @@ fun RegisterScreen(
                     modifier = Modifier
                         .fillMaxWidth(),
                     isPassword = true,
-                    value = confirmRegisterText,
-                    onValueChange = { confirmRegisterText = it},
+                    value = confirmPassword,
+                    onValueChange = { viewModel.setRegisterConfirmPassword(it)},
                     label = "confirm password"
                 )
 
@@ -109,8 +119,9 @@ fun RegisterScreen(
                 BaseButton(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    text = "register",
-                    onClick = {}
+                    text = if(isLoading) "Registering ..." else "register",
+                    onClick = { viewModel.register(onRegisterSuccess)},
+                    enabled = !isLoading
                 )
             }
         }
