@@ -1,9 +1,11 @@
 package com.example.choiceiomobile.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.choiceiomobile.ui.screens.auth.LoginScreen
 import com.example.choiceiomobile.ui.screens.auth.RegisterScreen
 import com.example.choiceiomobile.ui.screens.mood.FavouritesScreen
@@ -53,19 +55,26 @@ fun AppNavigation(){
             FavouritesScreen()
         }
 
-        composable ("FeedScreen") {
-            FeedScreen(
-                onMoodChoiceClick = {
-                    navController.navigate("MoodScreen")
+
+
+        composable("MoodScreen") {
+            MoodScreen(
+                onApproveClick = { selectedMood ->
+                    if (!selectedMood.isNullOrEmpty()) {
+                        navController.navigate("FeedScreen/$selectedMood")
+                    }
                 }
             )
         }
 
-        composable("MoodScreen") {
-            MoodScreen(
-                onApproveClick = {
-                    navController.navigate("FeedScreen")
-                }
+        composable(
+            route = "FeedScreen/{mood}",
+            arguments = listOf(navArgument("mood") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val mood = backStackEntry.arguments?.getString("mood") ?: ""
+            FeedScreen(
+                mood = mood,
+                onMoodChoiceClick = { navController.navigate("MoodScreen") }
             )
         }
 

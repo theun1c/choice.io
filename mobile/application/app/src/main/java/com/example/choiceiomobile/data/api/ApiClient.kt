@@ -11,4 +11,8 @@ object ApiClient {
     val authApi: AuthApi by lazy {
         retrofit.create(AuthApi::class.java)
     }
+
+    val animeApi: AnimeApi by lazy {
+        retrofit.create(AnimeApi::class.java)
+    }
 }

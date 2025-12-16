@@ -1,5 +1,4 @@
 package com.example.choiceiomobile.ui.screens.mood
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,29 +11,29 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.choiceiomobile.ui.components.buttons.BaseButton
 import com.example.choiceiomobile.ui.components.inputs.BaseTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoodScreen(
-    onApproveClick: () -> Unit
+    onApproveClick: (String) -> Unit
 ) {
+    var selectedMood by remember { mutableStateOf<String?>(null) }
+
     Scaffold (
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Mood"
-                    )
-                }
-            )
+            TopAppBar(title = { Text("Mood") })
         }
-    ) {
-        paddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -49,73 +48,54 @@ fun MoodScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                BaseButton(
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .fillMaxWidth(),
-                    text = "happy",
-                    onClick = {},
-                    initialIsWhiteTheme = true,
-                    isColorChangeable = true
-                )
-
-                Spacer(
-                    modifier = Modifier
-                        .height(16.dp)
-                )
-
-                BaseButton(
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .fillMaxWidth(),
-                    text = "sad",
-                    onClick = {},
-                    initialIsWhiteTheme = true,
-                    isColorChangeable = true
-                )
-
-                Spacer(
-                    modifier = Modifier
-                        .height(16.dp)
-                )
-
-                BaseButton(
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .fillMaxWidth(),
-                    text = "calm",
-                    onClick = {},
-                    initialIsWhiteTheme = true,
-                    isColorChangeable = true
-                )
-
-                Spacer(
-                    modifier = Modifier
-                        .height(16.dp)
-                )
-
-                BaseButton(
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .fillMaxWidth(),
-                    text = "energetic",
-                    onClick = {},
-                    initialIsWhiteTheme = true,
-                    isColorChangeable = true
-                )
+                listOf("happy", "sad", "calm", "energetic").forEach { mood ->
+                    MoodButton(
+                        mood = mood,
+                        isSelected = selectedMood == mood,
+                        onClick = {
+                            if (selectedMood == mood) {
+                                // Клик на уже выбранную - снимаем выбор
+                                selectedMood = null
+                            } else {
+                                // Выбираем новое настроение
+                                selectedMood = mood
+                            }
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 BaseButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = "approve",
-                    onClick = onApproveClick
+                    onClick = {
+                        selectedMood?.let { mood ->
+                            onApproveClick(mood)
+                        }
+                    },
+                    enabled = selectedMood != null
                 )
             }
         }
     }
 }
 
+@Composable
+private fun MoodButton(
+    mood: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    // Ключевое изменение: используем initialIsWhiteTheme для управления цветом
+    // и ВЫКЛЮЧАЕМ isColorChangeable
+    BaseButton(
+        modifier = Modifier.fillMaxWidth(),
+        text = mood,
+        onClick = onClick,
+        initialIsWhiteTheme = !isSelected, // Если выбрана - не белая (синяя)
+        isColorChangeable = false, // ВАЖНО: отключаем авто-переключение!
+        enabled = true
+    )
+}
