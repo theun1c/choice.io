@@ -15,4 +15,6 @@ object ApiClient {
     val animeApi: AnimeApi by lazy {
         retrofit.create(AnimeApi::class.java)
     }
+
+    val favouritesApi: FavouritesApi by lazy { retrofit.create(FavouritesApi::class.java) }
 }

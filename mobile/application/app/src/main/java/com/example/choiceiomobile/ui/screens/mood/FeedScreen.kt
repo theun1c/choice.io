@@ -6,6 +6,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
@@ -22,10 +23,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.choiceiomobile.data.repository.FavouritesRepositoryImpl // <-- ДОБАВЬ
 import com.example.choiceiomobile.ui.components.buttons.BaseButton
 import com.example.choiceiomobile.ui.components.cards.SwipeableAnimeCard
+import com.example.choiceiomobile.ui.favourites.FavouritesManager
 import com.example.choiceiomobile.ui.feed.AnimeFeedViewModel
 import com.example.choiceiomobile.ui.theme.Montserrat
+import com.example.choiceiomobile.ui.auth.AuthViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -37,7 +41,16 @@ fun FeedScreen(
     onFavoritesClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
-    val viewModel: AnimeFeedViewModel = viewModel()
+    val feedViewModel: AnimeFeedViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel()
+
+    // Получаем userId
+    val userId by authViewModel.userId.collectAsState()
+
+    // Создаем репозиторий для менеджера
+    val favouritesRepository = remember {
+        FavouritesRepositoryImpl()
+    }
 
     var currentIndex by remember { mutableStateOf(0) }
     var cardKey by remember { mutableStateOf(0) }
@@ -46,18 +59,28 @@ fun FeedScreen(
     val currentCardOffsetX = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
 
+    // Следим за избранными (можно отображать счетчик и т.д.)
+    val favouriteIds by FavouritesManager.favouriteIds.collectAsState()
+
+    // ИНИЦИАЛИЗИРУЕМ МЕНЕДЖЕР при получении userId <-- ВАЖНО!
+    LaunchedEffect(userId) {
+        userId?.let { id ->
+            FavouritesManager.initialize(id, favouritesRepository)
+        }
+    }
+
     LaunchedEffect(mood) {
-        viewModel.setMood(mood)
+        feedViewModel.setMood(mood)
         currentIndex = 0
         cardKey = 0
         currentCardOffsetX.snapTo(0f)
     }
 
-    val animeList by viewModel.animeList.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
-    val error by viewModel.error.collectAsState()
-    val canLoadMore by viewModel.canLoadMore.collectAsState()
+    val animeList by feedViewModel.animeList.collectAsState()
+    val isLoading by feedViewModel.isLoading.collectAsState()
+    val isLoadingMore by feedViewModel.isLoadingMore.collectAsState()
+    val error by feedViewModel.error.collectAsState()
+    val canLoadMore by feedViewModel.canLoadMore.collectAsState()
 
     LaunchedEffect(currentIndex, animeList.size) {
         if (animeList.isNotEmpty() &&
@@ -65,7 +88,7 @@ fun FeedScreen(
             !isLoadingMore &&
             !isLoading &&
             currentIndex >= animeList.size - 3) {
-            viewModel.loadMoreAnime()
+            feedViewModel.loadMoreAnime()
         }
     }
 
@@ -75,7 +98,7 @@ fun FeedScreen(
                 title = {
                     Text(
                         text = if (animeList.isNotEmpty()) {
-                            "choice.io • $mood • ${currentIndex + 1}"
+                            "choice.io • $mood • ${currentIndex + 1} • ❤️${favouriteIds.size}"
                         } else {
                             "choice.io • $mood"
                         },
@@ -154,7 +177,7 @@ fun FeedScreen(
                             text = "Повторить",
                             onClick = {
                                 coroutineScope.launch {
-                                    viewModel.refresh()
+                                    feedViewModel.refresh()
                                     currentIndex = 0
                                     cardKey = 0
                                     currentCardOffsetX.snapTo(0f)
@@ -247,6 +270,11 @@ fun FeedScreen(
                         },
                         onSwipedRight = {
                             coroutineScope.launch {
+                                // ДОБАВЛЯЕМ В ИЗБРАННОЕ при свайпе вправо - используем Менеджер!
+                                val animeId = currentAnime.id
+                                println("Добавляем в избранное: $animeId")
+                                FavouritesManager.addFavourite(animeId)
+
                                 cardKey++
                                 if (currentIndex < animeList.size - 1) {
                                     currentIndex++
@@ -305,7 +333,6 @@ fun FeedScreen(
         }
     }
 }
-
 
 // Кастомный модификатор для создания эффекта свечения ЗА карточкой
 @SuppressLint("SuspiciousModifierThen")

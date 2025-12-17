@@ -13,12 +13,12 @@ class AnimeRepositoryImpl : AnimeRepository {
 
     override suspend fun getFeedByMood(mood: String, limit: Int): Result<List<Anime>> {
         return try {
-            println("🔵 Запрос аниме для настроения: $mood, limit: $limit")
+            println("Запрос аниме для настроения: $mood, limit: $limit")
 
             val response = ApiClient.animeApi.getAnimeFeed(mood, limit)
 
             response.anime.firstOrNull()?.let { anime ->
-                println("📸 Первая картинка URL: ${anime.imageUrl}")
+                println("Первая картинка URL: ${anime.imageUrl}")
             }
 
             if (response.success) {
@@ -27,20 +27,20 @@ class AnimeRepositoryImpl : AnimeRepository {
                 // Кэшируем результат
                 cachedAnimeByMood[mood] = animeList.toMutableList()
 
-                println("✅ Загружено ${animeList.size} аниме для настроения: $mood")
+                println("Загружено ${animeList.size} аниме для настроения: $mood")
                 Result.success(animeList)
             } else {
                 Result.failure(Exception("API request failed"))
             }
         } catch (e: Exception) {
-            println("❌ Ошибка при загрузке аниме: ${e.message}")
+            println("Ошибка при загрузке аниме: ${e.message}")
             Result.failure(e)
         }
     }
 
     override suspend fun getFeedByMoodWithOffset(mood: String, limit: Int, offset: Int): Result<List<Anime>> {
         return try {
-            println("🔵 Запрос аниме с offset: mood=$mood, limit=$limit, offset=$offset")
+            println("Запрос аниме с offset: mood=$mood, limit=$limit, offset=$offset")
 
             // Если у API нет поддержки offset, делаем запрос и берем нужную часть
             val totalLimit = offset + limit
@@ -64,13 +64,13 @@ class AnimeRepositoryImpl : AnimeRepository {
                     }
                 }
 
-                println("✅ Загружено ${resultAnime.size} новых аниме (offset=$offset)")
+                println("Загружено ${resultAnime.size} новых аниме (offset=$offset)")
                 Result.success(resultAnime)
             } else {
                 Result.failure(Exception("API request failed"))
             }
         } catch (e: Exception) {
-            println("❌ Ошибка при загрузке аниме с offset: ${e.message}")
+            println("Ошибка при загрузке аниме с offset: ${e.message}")
             Result.failure(e)
         }
     }
@@ -78,7 +78,7 @@ class AnimeRepositoryImpl : AnimeRepository {
     // Альтернативный подход: симулируем разные запросы для разных страниц
     suspend fun getFeedByMoodPage(mood: String, page: Int, limit: Int = 20): Result<List<Anime>> {
         return try {
-            println("📄 Запрос страницы $page для настроения: $mood")
+            println("Запрос страницы $page для настроения: $mood")
 
             // В реальности здесь должен быть вызов API с параметром страницы
             // Но если API не поддерживает, можно использовать offset

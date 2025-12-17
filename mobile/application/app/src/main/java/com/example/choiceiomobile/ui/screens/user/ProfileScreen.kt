@@ -24,7 +24,8 @@ import com.example.choiceiomobile.ui.theme.Montserrat
 @Composable
 fun ProfileScreen(
     navController: NavController? = null,
-    onFavoritesClick: () -> Unit = {}
+    onFavoritesClick: () -> Unit = {},
+    onLogoutSuccess: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -107,10 +108,7 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxWidth(),
                     text = "leave",
                     onClick = {
-                        // Выход из аккаунта
-                        navController?.navigate("LoginScreen") {
-                            popUpTo(0) { inclusive = true }
-                        }
+                        onLogoutSuccess()  // Вызываем вместо прямой навигации
                     }
                 )
             }

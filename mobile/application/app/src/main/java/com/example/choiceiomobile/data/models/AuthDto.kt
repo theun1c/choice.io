@@ -7,6 +7,7 @@ data class AuthRequest(
 
 data class AuthResponse(
     val success: Boolean,
-    val message: String
+    val message: String,
+    val userId: Int
 )
 

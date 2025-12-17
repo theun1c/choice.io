@@ -7,42 +7,38 @@ import com.example.choiceiomobile.domain.repository.AuthRepository
 import kotlin.contracts.Returns
 
 class AuthRepositoryImpl : AuthRepository {
-    override suspend fun login(
-        username: String,
-        password: String
-    ): Result<User> {
+    private val api = ApiClient.authApi
+
+    override suspend fun login(username: String, password: String): Result<User> {
         return try {
-            val request = AuthRequest(username, password)
-            val response = ApiClient.authApi.login(request)
+            val request = AuthRequest(name = username, password = password)
+            val response = api.login(request)
 
             if (response.success) {
-                Result.success(
-                    User(
-                        username = username
-                    )
+                val user = User(
+                    userId = response.userId,
+                    username = username
                 )
+                Result.success(user)
             } else {
                 Result.failure(Exception(response.message))
             }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun register(
-        username: String,
-        password: String
-    ): Result<User> {
+    override suspend fun register(username: String, password: String): Result<User> {
         return try {
-            val request = AuthRequest(username, password)
-            val response = ApiClient.authApi.register(request)
+            val request = AuthRequest(name = username, password = password)
+            val response = api.register(request)
 
-            if(response.success) {
-                Result.success(
-                    User(
-                        username = username
-                    )
+            if (response.success) {
+                val user = User(
+                    userId = response.userId,
+                    username = username
                 )
+                Result.success(user)
             } else {
                 Result.failure(Exception(response.message))
             }
