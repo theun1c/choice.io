@@ -88,14 +88,13 @@ private fun MoodButton(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    // Ключевое изменение: используем initialIsWhiteTheme для управления цветом
-    // и ВЫКЛЮЧАЕМ isColorChangeable
+    // выключаем  isColorChangeable
     BaseButton(
         modifier = Modifier.fillMaxWidth(),
         text = mood,
         onClick = onClick,
-        initialIsWhiteTheme = !isSelected, // Если выбрана - не белая (синяя)
-        isColorChangeable = false, // ВАЖНО: отключаем авто-переключение!
+        initialIsWhiteTheme = !isSelected,
+        isColorChangeable = false, // ВАЖНО отключаем авто-переключение
         enabled = true
     )
 }

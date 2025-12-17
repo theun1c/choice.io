@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.choiceiomobile.ui.components.buttons.BaseButton
-import com.example.choiceiomobile.ui.components.cards.CardPlaceholder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,12 +51,7 @@ fun FavouritesScreen() {
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
                 items(placeholderItems) { itemTitle ->
-                    CardPlaceholder(
-                        title = itemTitle,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(500.dp)
-                    )
+
                 }
             }
 

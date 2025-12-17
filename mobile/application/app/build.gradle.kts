@@ -69,6 +69,13 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    //
+    // inject
     implementation("com.google.dagger:hilt-android:2.48.1")
+
+    // Для свайпов
+    implementation("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.28.0")
+
+    // Для загрузки картинок (Coil)
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }
