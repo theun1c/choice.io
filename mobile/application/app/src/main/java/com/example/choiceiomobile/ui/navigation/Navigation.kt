@@ -14,7 +14,7 @@ import com.example.choiceiomobile.ui.screens.mood.MoodScreen
 import com.example.choiceiomobile.ui.screens.user.ProfileScreen
 
 @Composable
-fun AppNavigation(){
+fun AppNavigation() {
     val navController = rememberNavController()
 
     NavHost(
@@ -28,9 +28,7 @@ fun AppNavigation(){
                 },
                 onLoginSuccess = {
                     navController.navigate("MoodScreen") {
-                        popUpTo("LoginScreen") {
-                            inclusive = true
-                        }
+                        popUpTo("LoginScreen") { inclusive = true }
                     }
                 }
             )
@@ -42,20 +40,21 @@ fun AppNavigation(){
                     navController.navigate("LoginScreen")
                 },
                 onRegisterSuccess = {
-                    navController.navigate("MoodScreen"){
-                        popUpTo("LoginScreen") {
-                            inclusive = true
-                        }
+                    navController.navigate("MoodScreen") {
+                        popUpTo("LoginScreen") { inclusive = true }
                     }
                 }
             )
         }
 
         composable("FavouritesScreen") {
-            FavouritesScreen()
+            FavouritesScreen(
+                navController = navController,
+                onProfileClick = {
+                    navController.navigate("ProfileScreen")
+                }
+            )
         }
-
-
 
         composable("MoodScreen") {
             MoodScreen(
@@ -63,6 +62,12 @@ fun AppNavigation(){
                     if (!selectedMood.isNullOrEmpty()) {
                         navController.navigate("FeedScreen/$selectedMood")
                     }
+                },
+                onFavoritesClick = {
+                    navController.navigate("FavouritesScreen")
+                },
+                onProfileClick = {
+                    navController.navigate("ProfileScreen")
                 }
             )
         }
@@ -74,12 +79,23 @@ fun AppNavigation(){
             val mood = backStackEntry.arguments?.getString("mood") ?: ""
             FeedScreen(
                 mood = mood,
-                onMoodChoiceClick = { navController.navigate("MoodScreen") }
+                onMoodChoiceClick = { navController.navigate("MoodScreen") },
+                onFavoritesClick = {
+                    navController.navigate("FavouritesScreen")
+                },
+                onProfileClick = {
+                    navController.navigate("ProfileScreen")
+                }
             )
         }
 
-        composable("ProfileScreen"){
-            ProfileScreen()
+        composable("ProfileScreen") {
+            ProfileScreen(
+                navController = navController,
+                onFavoritesClick = {
+                    navController.navigate("FavouritesScreen")
+                }
+            )
         }
     }
 }

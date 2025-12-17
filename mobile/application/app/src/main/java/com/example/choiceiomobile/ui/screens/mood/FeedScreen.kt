@@ -6,6 +6,9 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,10 +20,12 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.choiceiomobile.ui.components.buttons.BaseButton
 import com.example.choiceiomobile.ui.components.cards.SwipeableAnimeCard
 import com.example.choiceiomobile.ui.feed.AnimeFeedViewModel
+import com.example.choiceiomobile.ui.theme.Montserrat
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -28,7 +33,9 @@ import kotlin.math.abs
 @Composable
 fun FeedScreen(
     mood: String,
-    onMoodChoiceClick: () -> Unit
+    onMoodChoiceClick: () -> Unit,
+    onFavoritesClick: () -> Unit,
+    onProfileClick: () -> Unit
 ) {
     val viewModel: AnimeFeedViewModel = viewModel()
 
@@ -64,7 +71,7 @@ fun FeedScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         text = if (animeList.isNotEmpty()) {
@@ -72,13 +79,44 @@ fun FeedScreen(
                         } else {
                             "choice.io • $mood"
                         },
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.SemiBold
-                        )
+                        fontFamily = Montserrat,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
+                        color = Color.White
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black.copy(alpha = 0.9f)
+                navigationIcon = {
+                    // Левая кнопка - Избранное (синяя)
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 9.dp) // Отступ слева
+                    ) {
+                        TopAppBarButton(
+                            onClick = onFavoritesClick,
+                            icon = Icons.Filled.Favorite,
+                            backgroundColor = Color(0xFF0022FF),
+                            iconColor = Color.White,
+                            modifier = Modifier.size(50.dp)
+                        )
+                    }
+                },
+                actions = {
+                    // Правая кнопка - Профиль (синяя)
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 9.dp) // Отступ справа
+                    ) {
+                        TopAppBarButton(
+                            onClick = onProfileClick,
+                            icon = Icons.Filled.Person,
+                            backgroundColor = Color(0xFF0022FF),
+                            iconColor = Color.White,
+                            modifier = Modifier.size(50.dp)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Black
                 )
             )
         }
@@ -108,7 +146,8 @@ fun FeedScreen(
                         Text(
                             text = error!!,
                             color = Color.White,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            fontFamily = Montserrat
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         BaseButton(
@@ -131,7 +170,8 @@ fun FeedScreen(
                 ) {
                     Text(
                         text = "Нет аниме для настроения: $mood",
-                        color = Color.White
+                        color = Color.White,
+                        fontFamily = Montserrat
                     )
                 }
             } else {
@@ -182,7 +222,8 @@ fun FeedScreen(
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
                                     text = "Загружаем новые аниме...",
-                                    color = Color.White
+                                    color = Color.White,
+                                    fontFamily = Montserrat
                                 )
                             }
                         }
@@ -239,7 +280,8 @@ fun FeedScreen(
                         Text(
                             text = "Загружаем новые аниме...",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color.White.copy(alpha = 0.7f)
+                            color = Color.White.copy(alpha = 0.7f),
+                            fontFamily = Montserrat
                         )
                     }
                 }
@@ -263,6 +305,7 @@ fun FeedScreen(
         }
     }
 }
+
 
 // Кастомный модификатор для создания эффекта свечения ЗА карточкой
 @SuppressLint("SuspiciousModifierThen")

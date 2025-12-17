@@ -9,6 +9,7 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false);
 builder.Services.AddSingleton<ISupabaseService, SupabaseService>();
 builder.Services.AddScoped<IFeedService, FeedService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IFavouriteService, FavouriteService>();
 
 // Контроллеры
 builder.Services.AddControllers();

@@ -1,29 +1,22 @@
 package com.example.choiceiomobile.ui.screens.auth
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.choiceiomobile.ui.auth.AuthViewModel
 import com.example.choiceiomobile.ui.components.buttons.BaseButton
 import com.example.choiceiomobile.ui.components.inputs.BaseTextField
+import com.example.choiceiomobile.ui.theme.Montserrat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +24,6 @@ fun RegisterScreen(
     onLoginClick: () -> Unit,
     onRegisterSuccess: () -> Unit = {}
 ) {
-
     val viewModel: AuthViewModel = viewModel()
 
     val username by viewModel.registerUsername.collectAsState()
@@ -42,88 +34,102 @@ fun RegisterScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Register"
+                        text = "register",
+                        fontFamily = Montserrat,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 24.sp,
+                        color = Color.White
                     )
-                }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Black
+                )
             )
         }
     ) { paddingValues ->
-        Column (
+        Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .padding(16.dp)
+                .background(Color.Black)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column (
+            Column(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                if (error.isNotEmpty()) {
+                    Text(
+                        text = error,
+                        color = Color(0xFFFF383C),
+                        fontFamily = Montserrat,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    )
+                }
+
                 BaseTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    isPassword = false,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = "username",
                     value = username,
-                    onValueChange = { viewModel.setRegisterUsername(it)},
-                    label = "username"
+                    onValueChange = { viewModel.setRegisterUsername(it) }
                 )
 
-                Spacer(
-                    modifier = Modifier
-                        .height(16.dp)
-                )
+                Spacer(modifier = Modifier.height(16.dp))
 
                 BaseTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    isPassword = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = "password",
                     value = password,
-                    onValueChange = { viewModel.setRegisterPassword(it)},
-                    label = "password"
+                    isPassword = true,
+                    onValueChange = { viewModel.setRegisterPassword(it) }
                 )
 
-                Spacer(
-                    modifier = Modifier
-                        .height(16.dp)
-                )
+                Spacer(modifier = Modifier.height(16.dp))
 
                 BaseTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    isPassword = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = "confirm password",
                     value = confirmPassword,
-                    onValueChange = { viewModel.setRegisterConfirmPassword(it)},
-                    label = "confirm password"
+                    isPassword = true,
+                    onValueChange = { viewModel.setRegisterConfirmPassword(it) }
                 )
-
             }
 
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth()
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
                 BaseButton(
                     modifier = Modifier
                         .padding(bottom = 8.dp)
                         .fillMaxWidth(),
                     text = "log in",
-                    initialIsWhiteTheme = true,
-                    onClick = onLoginClick
+                    onClick = onLoginClick,
+                    initialIsWhiteTheme = true
                 )
 
                 BaseButton(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     text = if(isLoading) "Registering ..." else "register",
-                    onClick = { viewModel.register(onRegisterSuccess)},
-                    enabled = !isLoading
+                    onClick = {
+                        viewModel.register(onRegisterSuccess)
+                    },
+                    enabled = !isLoading &&
+                            username.isNotEmpty() &&
+                            password.isNotEmpty() &&
+                            confirmPassword.isNotEmpty() &&
+                            password == confirmPassword
                 )
             }
         }
     }
 }
+
